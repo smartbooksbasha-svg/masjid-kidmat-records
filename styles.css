@@ -250,6 +250,24 @@ td .mono{font-family:var(--font-display);font-weight:600;color:var(--accent)}
   .content{padding:18px 16px}
 }
 
+/* ---------- mobile polish ---------- */
+@media(max-width:560px){
+  .topbar{gap:8px;padding:10px max(12px,env(safe-area-inset-left)) 10px max(12px,env(safe-area-inset-right))}
+  .topbar .title{font-size:.98rem}
+  .user-chip{padding:4px}
+  .user-chip>span:last-child{display:none}
+  .user-chip .av{width:30px;height:30px}
+  .toggle{padding:0 11px}
+  .content{padding:16px 14px calc(24px + env(safe-area-inset-bottom))}
+  .page-head h1{font-size:1.3rem}
+  .role-tabs button{font-size:.74rem;padding:9px 4px}
+  .seg button{min-height:38px;padding:6px 14px}
+  .sidebar{padding-top:calc(18px + env(safe-area-inset-top))}
+  .fid{font-size:1.3rem}
+  .stat .n{font-size:1.7rem}
+  .auth-card{padding:26px 20px}
+}
+
 /* print */
 #printArea{display:none}
 @media print{
