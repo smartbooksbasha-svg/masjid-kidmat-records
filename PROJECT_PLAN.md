@@ -12,7 +12,10 @@ save, dashboard counts, Family ID + QR, 3-role login, PDF/Excel export.
 - [x] 2. User Research
 - [x] 3. Requirements (must/should/nice/future)
 - [x] 4. PRD.md — full blueprint
-- [ ] 5. PRD Review + validate WITH user (one short message, wait for OK)
+- [~] 5. PRD Review + validate WITH user (PRD sent with preview gate)
+- [~] 11. Implementation — UI PREVIEW GATE LIVE 2026-10-09: repo
+  smartbooksbasha-svg/masjid-kidmat-records, ui-preview.html (3 directions).
+  Awaiting pick → then full build.
 - [ ] 6. User Flow
 - [ ] 7. UX (wireframe, IA, nav, states, mobile)
 - [ ] 8. UI Design System — load design-taste-frontend + ui-ux-pro-max engine
