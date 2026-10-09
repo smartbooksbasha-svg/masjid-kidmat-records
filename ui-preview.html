@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Masjid Kidmat Records — Design Directions</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=Sora:wght@400;500;600;700&family=Manrope:wght@400;500;600;700&family=Spectral:ital,wght@0,400;0,600;0,700;1,500&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root { --wrap: 1080px; }
+  body {
+    font-family: 'Inter', system-ui, sans-serif;
+    background: #0d0f13; color: #eef1f6;
+    -webkit-font-smoothing: antialiased;
+  }
+  .intro { max-width: 720px; margin: 0 auto; padding: 56px 22px 8px; text-align: left; }
+  .intro .eyebrow { font-size: 12px; letter-spacing: .22em; text-transform: uppercase; color: #7f8aa3; }
+  .intro h1 { font-family: 'Space Grotesk'; font-size: clamp(1.6rem, 5vw, 2.3rem); margin: 12px 0 10px; letter-spacing: -.02em; }
+  .intro p { color: #9aa6bd; font-size: 15px; line-height: 1.7; }
+  .intro .hint { margin-top: 14px; padding: 12px 16px; border: 1px solid #232a38; border-radius: 12px; background: #121620; font-size: 14px; color: #c7cfdf; }
+
+  .dir { max-width: var(--wrap); margin: 64px auto 0; padding: 0 22px; }
+  .dir-head { display: flex; align-items: flex-start; gap: 16px; margin-bottom: 20px; }
+  .badge { flex: none; width: 46px; height: 46px; border-radius: 14px; display: grid; place-items: center;
+           font-family: 'Space Grotesk'; font-weight: 700; font-size: 20px; }
+  .dir-head h2 { font-family: 'Space Grotesk'; font-size: 1.35rem; letter-spacing: -.01em; }
+  .dir-head .mood { color: #8d99b2; font-size: 13.5px; margin-top: 3px; }
+  .dir-head .dial { color: #5f6a82; font-size: 12px; margin-top: 2px; letter-spacing: .04em; }
+
+  .stage { border-radius: 22px; overflow: hidden; border: 1px solid #232a38; }
+
+  /* ---------- shared mock bits ---------- */
+  .topbar { display: flex; align-items: center; justify-content: space-between; padding: 14px 20px; }
+  .brand { display: flex; align-items: center; gap: 10px; font-weight: 600; font-size: 14px; }
+  .crest { width: 30px; height: 30px; border-radius: 9px; display: grid; place-items: center; flex: none; }
+  .pill { font-size: 11.5px; padding: 6px 13px; border-radius: 999px; font-weight: 600; }
+  .subhead { font-size: 11px; letter-spacing: .18em; text-transform: uppercase; opacity: .6; }
+
+  .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  @media (max-width: 760px){ .stat-grid { grid-template-columns: repeat(2, 1fr); } }
+  .stat .n { font-family: 'Space Grotesk'; font-weight: 700; }
+  .stat .l { font-size: 12px; opacity: .72; margin-top: 2px; }
+
+  .formcard { border-radius: 16px; padding: 18px; }
+  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  @media (max-width: 620px){ .row2 { grid-template-columns: 1fr; } }
+  .field label { display: block; font-size: 12px; margin-bottom: 5px; opacity: .74; }
+  .inp { height: 42px; border-radius: 10px; display: flex; align-items: center; padding: 0 13px; font-size: 13.5px; }
+  .docs { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
+  .doc { font-size: 11.5px; padding: 6px 10px 6px 11px; border-radius: 9px; display: flex; align-items: center; gap: 7px; }
+  .yn { display: flex; gap: 3px; }
+  .yn b { font-size: 9.5px; padding: 2px 6px; border-radius: 5px; font-weight: 700; }
+
+  .idqr { display: flex; align-items: center; gap: 16px; border-radius: 16px; padding: 16px 18px; }
+  .qrwrap { width: 84px; height: 84px; border-radius: 10px; padding: 7px; flex: none; }
+
+  /* ================= DIRECTION 1 — ARCTIC GLASS ================= */
+  .d1 { background: #0b1220; position: relative; color: #eaf1fb; }
+  .d1 .bgbg { position:absolute; inset:0; background:
+      radial-gradient(700px 420px at 82% -10%, rgba(95,168,232,.34), transparent 60%),
+      radial-gradient(560px 420px at 8% 108%, rgba(64,120,190,.30), transparent 60%),
+      linear-gradient(180deg,#0b1220,#0a1526 55%,#081020); }
+  .d1 .photo { position:absolute; inset:0; background:
+      linear-gradient(180deg, rgba(8,16,32,.72), rgba(8,16,32,.94)),
+      url('https://picsum.photos/seed/masjid-dawn/1400/900') center/cover; opacity:.5; }
+  .d1 .inner { position: relative; padding: 0 20px 22px; }
+  .d1 .topbar { border-bottom: 1px solid rgba(255,255,255,.09); }
+  .d1 .crest { background: linear-gradient(145deg,#6fb3ec,#3d7fc4); color:#06101f; }
+  .d1 .pill { background: rgba(95,168,232,.16); color:#9fc9f2; border:1px solid rgba(95,168,232,.3); }
+  .d1 .stat { background: rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.12);
+       backdrop-filter: blur(9px); border-radius:14px; padding:13px 15px;
+       box-shadow: inset 0 1px 0 rgba(255,255,255,.16); }
+  .d1 .stat .n { color:#9fc9f2; font-size: 25px; }
+  .d1 .sec-title { font-family:'Space Grotesk'; font-size:15px; margin: 22px 0 12px; }
+  .d1 .formcard { background: rgba(255,255,255,.055); border:1px solid rgba(255,255,255,.12); backdrop-filter: blur(12px); }
+  .d1 .inp { background: rgba(8,16,32,.55); border:1px solid rgba(255,255,255,.12); color:#aebbd0; }
+  .d1 .doc { background: rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.11); }
+  .d1 .yn .y { background:#2e7d5b; color:#d7f5e6; } .d1 .yn .n { background:#3a2a34; color:#f0b9c8; }
+  .d1 .idqr { background: rgba(95,168,232,.10); border:1px solid rgba(95,168,232,.28); }
+  .d1 .qrwrap { background:#fff; }
+  .d1 .big { font-family:'Space Grotesk'; font-size:20px; color:#fff; }
+  .d1 .mut { color:#8595ad; font-size:12.5px; }
+
+  /* ================= DIRECTION 2 — EMERALD LATTICE ================= */
+  .d2 { background:#f2f5f0; color:#132a24; position: relative; }
+  .d2 .lattice { position:absolute; inset:0; opacity:.5; pointer-events:none;
+    background-image: radial-gradient(circle at 1px 1px, #134b3d22 1.5px, transparent 0);
+    background-size: 22px 22px; }
+  .d2 .inner { position: relative; padding: 0 20px 22px; }
+  .d2 .topbar { border-bottom:1px solid #e0e7e1; background: rgba(255,255,255,.7); backdrop-filter: blur(8px); }
+  .d2 .crest { background: linear-gradient(145deg,#12876c,#0c5f4b); color:#eafff8; }
+  .d2 .pill { background:#0e7c66; color:#eafff8; }
+  .d2 .stat { background:#fff; border:1px solid #e2e9e3; border-radius:16px; padding:14px 16px;
+      box-shadow: 0 10px 26px rgba(19,75,61,.07); }
+  .d2 .stat .n { color:#0e7c66; font-size:26px; }
+  .d2 .sec-title { font-family:'Sora'; font-weight:600; font-size:15px; margin: 22px 0 12px; color:#12362c; }
+  .d2 .formcard { background:#fff; border:1px solid #e2e9e3; box-shadow: 0 14px 34px rgba(19,75,61,.08); }
+  .d2 .inp { background:#f6f8f5; border:1px solid #dde5de; color:#4a5a52; }
+  .d2 .doc { background:#f3f7f3; border:1px solid #dfe8e0; color:#2c463c; }
+  .d2 .yn .y { background:#0e7c66; color:#eafff8; } .d2 .yn .n { background:#f1e2e6; color:#9c3b57; }
+  .d2 .idqr { background:#eef6f1; border:1px solid #cfe6db; }
+  .d2 .qrwrap { background:#fff; border:1px solid #cfe6db; }
+  .d2 .big { font-family:'Sora'; font-weight:700; font-size:20px; color:#0c5f4b; }
+  .d2 .mut { color:#6a7c72; font-size:12.5px; }
+  .d2 h3 { font-family:'Sora'; }
+
+  /* ================= DIRECTION 3 — LEDGER IVORY ================= */
+  .d3 { background:#f3f3ee; color:#191b21; }
+  .d3 .inner { position: relative; padding: 0 20px 22px; }
+  .d3 .topbar { border-bottom:1px solid #d9d9d0; }
+  .d3 .crest { background:#191b21; color:#f3f3ee; border-radius:6px; font-family:'Spectral'; }
+  .d3 .brand { font-family:'Spectral'; font-weight:600; letter-spacing:.01em; }
+  .d3 .pill { background:#3b4fd8; color:#fff; border-radius:6px; }
+  .d3 .stat { border:1px solid #d3d3c9; border-radius:8px; padding:13px 15px; background:#f9f9f5; }
+  .d3 .stat .n { font-family:'Spectral'; font-weight:700; font-size:26px; color:#3b4fd8; }
+  .d3 .sec-title { font-family:'Spectral'; font-weight:600; font-size:16px; margin: 22px 0 12px; }
+  .d3 .formcard { background:#fbfbf6; border:1px solid #d6d6cc; border-radius:8px; }
+  .d3 .inp { background:#fff; border:1px solid #d3d3c9; border-radius:6px; color:#5a5d68; }
+  .d3 .doc { background:#fff; border:1px solid #d6d6cc; border-radius:6px; color:#2c2e37; }
+  .d3 .yn .y { background:#2f7d4f; color:#e6f7ec; } .d3 .yn .n { background:#efe1e4; color:#9c3b57; }
+  .d3 .idqr { background:#fff; border:1px solid #d6d6cc; border-radius:8px; }
+  .d3 .qrwrap { background:#fff; border:1px solid #d6d6cc; }
+  .d3 .big { font-family:'Spectral'; font-weight:700; font-size:20px; }
+  .d3 .mut { color:#73767f; font-size:12.5px; }
+
+  .lbl { font-size:11px; letter-spacing:.16em; text-transform:uppercase; opacity:.55; margin-bottom:20px; }
+  .foot { max-width:720px; margin: 70px auto 90px; padding: 0 22px; color:#8d99b2; font-size:14px; line-height:1.7; }
+  .foot b { color:#dbe3f0; }
+</style>
+</head>
+<body>
+
+<div class="intro">
+  <div class="eyebrow">Masjid e Mohammadi · Kidmat Committee</div>
+  <h1>Family Records — 3 design directions</h1>
+  <p>Teeno me dashboard + form + Family ID QR ka real layout hai (sample data). Neeche dekho, phir number bata do — ya mix kar do
+  (jaise "2 ka style + 1 ka dark mood"). Ek chuno, main usi par poora software bana dunga.</p>
+  <div class="hint">Reply karo: <b>1</b> / <b>2</b> / <b>3</b> — ya "mix" + kaise.</div>
+</div>
+
+<!-- ============ 1 ============ -->
+<section class="dir">
+  <div class="dir-head">
+    <div class="badge" style="background:#1b3557;color:#9fc9f2;border:1px solid #2d5285">1</div>
+    <div>
+      <h2>Arctic Glass Command</h2>
+      <div class="mood">Modern · premium · trustworthy (dark glass + arctic blue)</div>
+      <div class="dial">VARIANCE 5 · MOTION 4 · DENSITY 4</div>
+    </div>
+  </div>
+  <div class="stage d1">
+    <div class="bgbg"></div><div class="photo"></div>
+    <div class="inner">
+      <div class="topbar">
+        <div class="brand"><span class="crest">M</span> Masjid e Mohammadi · Kidmat Committee</div>
+        <span class="pill">Super Admin ▾</span>
+      </div>
+      <div style="padding-top:20px">
+        <div class="subhead">Dashboard</div>
+        <div class="stat-grid" style="margin-top:12px">
+          <div class="stat"><div class="n">428</div><div class="l">Total Houses</div></div>
+          <div class="stat"><div class="n">612</div><div class="l">Men</div></div>
+          <div class="stat"><div class="n">590</div><div class="l">Women</div></div>
+          <div class="stat"><div class="n">705</div><div class="l">Children</div></div>
+          <div class="stat"><div class="n">402</div><div class="l">Married</div></div>
+          <div class="stat"><div class="n">388</div><div class="l">Unmarried</div></div>
+          <div class="stat"><div class="n">61</div><div class="l">Widow</div></div>
+          <div class="stat"><div class="n">34</div><div class="l">Disability</div></div>
+          <div class="stat"><div class="n">289</div><div class="l">Govt. Scheme</div></div>
+        </div>
+      </div>
+      <div class="sec-title">Add Family</div>
+      <div class="formcard">
+        <div class="row2">
+          <div class="field"><label>Family / House Name</label><div class="inp">Abdul Rahman</div></div>
+          <div class="field"><label>Phone Number</label><div class="inp">98xx xxx xxx</div></div>
+        </div>
+        <div class="row2" style="margin-top:12px">
+          <div class="field"><label>Father Name</label><div class="inp">Mohd Yusuf</div></div>
+          <div class="field"><label>Gender</label><div class="inp">Male / Female ▾</div></div>
+        </div>
+        <div class="field" style="margin-top:14px"><label>Documents held — Yes / No</label>
+          <div class="docs">
+            <span class="doc">Aadhaar <span class="yn"><b class="y">Y</b><b class="n">N</b></span></span>
+            <span class="doc">PAN Card <span class="yn"><b class="y">Y</b><b class="n">N</b></span></span>
+            <span class="doc">Passport <span class="yn"><b class="y">Y</b><b class="n">N</b></span></span>
+            <span class="doc">Birth Cert. <span class="yn"><b class="y">Y</b><b class="n">N</b></span></span>
+            <span class="doc">Voter ID <span class="yn"><b class="y">Y</b><b class="n">N</b></span></span>
+            <span class="doc">+ custom…</span>
+          </div>
+        </div>
+      </div>
+      <div class="sec-title">After saving → auto generated</div>
+      <div class="idqr">
+        <div class="qrwrap" id="qr1"></div>
+        <div>
+          <div class="mut">FAMILY ID</div>
+          <div class="big">MEMC-2026-000428</div>
+          <div class="mut" style="margin-top:4px">Scan QR → full family record · print / label ready</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 2 ============ -->
+<section class="dir">
+  <div class="dir-head">
+    <div class="badge" style="background:#e2f2ec;color:#0c5f4b;border:1px solid #b9ddd0">2</div>
+    <div>
+      <h2>Emerald Lattice</h2>
+      <div class="mood">Trust-first · official register · calm (emerald + teal, warm light)</div>
+      <div class="dial">VARIANCE 4 · MOTION 3 · DENSITY 4</div>
+    </div>
+  </div>
+  <div class="stage d2">
+    <div class="lattice"></div>
+    <div class="inner">
+      <div class="topbar">
+        <div class="brand"><span class="crest">M</span> Masjid e Mohammadi · Kidmat Committee</div>
+        <span class="pill">Super Admin ▾</span>
+      </div>
+      <div style="padding-top:20px">
+        <div class="subhead" style="color:#0c5f4b">Dashboard</div>
+        <div class="stat-grid" style="margin-top:12px">
+          <div class="stat"><div class="n">428</div><div class="l">Total Houses</div></div>
+          <div class="stat"><div class="n">612</div><div class="l">Men</div></div>
+          <div class="stat"><div class="n">590</div><div class="l">Women</div></div>
+          <div class="stat"><div class="n">705</div><div class="l">Children</div></div>
+          <div class="stat"><div class="n">402</div><div class="l">Married</div></div>
+          <div class="stat"><div class="n">388</div><div class="l">Unmarried</div></div>
+          <div class="stat"><div class="n">61</div><div class="l">Widow</div></div>
+          <div class="stat"><div class="n">34</div><div class="l">Disability</div></div>
+          <div class="stat"><div class="n">289</div><div class="l">Govt. Scheme</div></div>
+        </div>
+      </div>
+      <div class="sec-title">Add Family</div>
+      <div class="formcard">
+        <div class="row2">
+          <div class="field"><label>Family / House Name</label><div class="inp">Abdul Rahman</div></div>
+          <div class="field"><label>Phone Number</label><div class="inp">98xx xxx xxx</div></div>
+        </div>
+        <div class="row2" style="margin-top:12px">
+          <div class="field"><label>Father Name</label><div class="inp">Mohd Yusuf</div></div>
+          <div class="field"><label>Gender</label><div class="inp">Male / Female ▾</div></div>
+        </div>
+        <div class="field" style="margin-top:14px"><label>Documents held — Yes / No</label>
+          <div class="docs">
+            <span class="doc">Aadhaar <span class="yn"><b class="y">Y</b><b class="n">N</b></span></span>
+            <span class="doc">PAN Card <span class="yn"><b class="y">Y</b><b class="n">N</b></span></span>
+            <span class="doc">Passport <span class="yn"><b class="y">Y</b><b class="n">N</b></span></span>
+            <span class="doc">Ration Card <span class="yn"><b class="y">Y</b><b class="n">N</b></span></span>
+            <span class="doc">+ custom…</span>
+          </div>
+        </div>
+      </div>
+      <div class="sec-title">After saving → auto generated</div>
+      <div class="idqr">
+        <div class="qrwrap" id="qr2"></div>
+        <div>
+          <div class="mut">FAMILY ID</div>
+          <div class="big">MEMC-2026-000428</div>
+          <div class="mut" style="margin-top:4px">Scan QR → full family record · print / label ready</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 3 ============ -->
+<section class="dir">
+  <div class="dir-head">
+    <div class="badge" style="background:#e6e8fb;color:#2936a8;border:1px solid #c4c9f2">3</div>
+    <div>
+      <h2>Ledger Ivory</h2>
+      <div class="mood">Editorial · record-book · print-like (ivory paper + indigo accent, serif)</div>
+      <div class="dial">VARIANCE 4 · MOTION 2 · DENSITY 5</div>
+    </div>
+  </div>
+  <div class="stage d3">
+    <div class="inner">
+      <div class="topbar">
+        <div class="brand"><span class="crest">M</span> Masjid e Mohammadi · Kidmat Committee</div>
+        <span class="pill">Super Admin ▾</span>
+      </div>
+      <div style="padding-top:20px">
+        <div class="subhead" style="color:#3b4fd8">Dashboard</div>
+        <div class="stat-grid" style="margin-top:12px">
+          <div class="stat"><div class="n">428</div><div class="l">Total Houses</div></div>
+          <div class="stat"><div class="n">612</div><div class="l">Men</div></div>
+          <div class="stat"><div class="n">590</div><div class="l">Women</div></div>
+          <div class="stat"><div class="n">705</div><div class="l">Children</div></div>
+          <div class="stat"><div class="n">402</div><div class="l">Married</div></div>
+          <div class="stat"><div class="n">388</div><div class="l">Unmarried</div></div>
+          <div class="stat"><div class="n">61</div><div class="l">Widow</div></div>
+          <div class="stat"><div class="n">34</div><div class="l">Disability</div></div>
+          <div class="stat"><div class="n">289</div><div class="l">Govt. Scheme</div></div>
+        </div>
+      </div>
+      <div class="sec-title">Add Family</div>
+      <div class="formcard">
+        <div class="row2">
+          <div class="field"><label>Family / House Name</label><div class="inp">Abdul Rahman</div></div>
+          <div class="field"><label>Phone Number</label><div class="inp">98xx xxx xxx</div></div>
+        </div>
+        <div class="row2" style="margin-top:12px">
+          <div class="field"><label>Father Name</label><div class="inp">Mohd Yusuf</div></div>
+          <div class="field"><label>Gender</label><div class="inp">Male / Female ▾</div></div>
+        </div>
+        <div class="field" style="margin-top:14px"><label>Documents held — Yes / No</label>
+          <div class="docs">
+            <span class="doc">Aadhaar <span class="yn"><b class="y">Y</b><b class="n">N</b></span></span>
+            <span class="doc">PAN Card <span class="yn"><b class="y">Y</b><b class="n">N</b></span></span>
+            <span class="doc">Passport <span class="yn"><b class="y">Y</b><b class="n">N</b></span></span>
+            <span class="doc">Birth Cert. <span class="yn"><b class="y">Y</b><b class="n">N</b></span></span>
+            <span class="doc">+ custom…</span>
+          </div>
+        </div>
+      </div>
+      <div class="sec-title">After saving → auto generated</div>
+      <div class="idqr">
+        <div class="qrwrap" id="qr3"></div>
+        <div>
+          <div class="mut">FAMILY ID</div>
+          <div class="big">MEMC-2026-000428</div>
+          <div class="mut" style="margin-top:4px">Scan QR → full family record · print / label ready</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="foot">
+  <p><b>Note:</b> teeno functional layouts hain (dark / light / editorial). Koi bhi chuno — phir main isi par poora app banaunga:
+  dashboard, family+member form, documents yes/no, Family ID + QR, 3-role login, PDF/Excel export.</p>
+</div>
+
+<script>
+  // draw a tiny fake QR pattern (preview only)
+  function fakeQR(el){
+    const n=21, s=100, c=document.createElement('canvas');
+    const dpr = window.devicePixelRatio||1;
+    c.width=s*dpr; c.height=s*dpr; c.style.width='100%'; c.style.height='100%'; c.style.display='block';
+    const x=c.getContext('2d'); x.scale(dpr,dpr); x.fillStyle='#fff'; x.fillRect(0,0,s,s);
+    x.fillStyle='#111'; const cell=s/n;
+    for(let i=0;i<n;i++)for(let j=0;j<n;j++){ if(((i*7+j*13+ (i*j)%5)%3)===0) x.fillRect(i*cell,j*cell,cell,cell); }
+    // finder squares
+    function finder(px,py){ x.fillStyle='#111'; x.fillRect(px*cell,py*cell,7*cell,7*cell); x.fillStyle='#fff'; x.fillRect((px+1)*cell,(py+1)*cell,5*cell,5*cell); x.fillStyle='#111'; x.fillRect((px+2)*cell,(py+2)*cell,3*cell,3*cell);}
+    finder(0,0);finder(14,0);finder(0,14);
+    el.appendChild(c);
+  }
+  ['qr1','qr2','qr3'].forEach(id=>{ const e=document.getElementById(id); if(e) fakeQR(e); });
+</script>
+</body>
+</html>
