@@ -1,32 +1,33 @@
 -- ============================================================
 --  Masjid e Mohammadi · Kidmat Committee — Family Records
---  Supabase schema  (Postgres)
+--  Supabase schema (Postgres)  ·  SECURE allowlist design
 -- ------------------------------------------------------------
 --  HOW TO USE
---  1. Open your Supabase project → SQL Editor → New query.
---  2. Paste this whole file and press RUN.
---  3. Put your Project URL + anon key into config.js.
+--   1. Supabase dashboard → SQL Editor → New query
+--   2. Paste this WHOLE file → RUN
+--   3. Project Settings → API → copy "Project URL" + "anon public" key
+--      into the app (config.js).
 --
---  SECURITY NOTE (read this)
---  RLS is ON and, by default, only signed-in Supabase Auth users
---  can read/write. The app currently uses its own local login
---  (localStorage), so cloud sync stays OFF until you either:
---    (a) switch the app to Supabase Auth, or
---    (b) for a QUICK private demo, uncomment the "anon demo"
---        policy block at the bottom (this exposes data to anyone
---        who has the public anon key — do NOT use with real PII).
+--  SECURITY MODEL (why family data stays private)
+--   * The anon key is PUBLIC (it ships in the web app) — so the
+--     database itself must gate access, not the key.
+--   * Access requires a real login (Supabase Auth, email+password).
+--   * Even then, a user sees data ONLY if they have a row in
+--     app_users (the allowlist). A random sign-up gets NOTHING.
+--   * Roles mirror the app: super/admin see all families; a family
+--     login sees only its own family record.
 -- ============================================================
 
 -- ---------- tables ----------
 create table if not exists public.families (
-  id          text primary key,              -- e.g. MEMC-2026-000001
+  id          text primary key,              -- MEMC-2026-000001
   house_name  text not null default '',
   house_no    text default '',
   address     text default '',
   phone       text default '',
   notes       text default '',
-  docs        jsonb not null default '{}'::jsonb,   -- {aadhaar:'yes',...}
-  custom      jsonb not null default '[]'::jsonb,   -- [{label,value},...]
+  docs        jsonb not null default '{}'::jsonb,
+  custom      jsonb not null default '[]'::jsonb,
   created_by  text default '',
   created_at  timestamptz not null default now(),
   updated_at  timestamptz not null default now()
@@ -50,56 +51,106 @@ create table if not exists public.members (
 );
 create index if not exists members_family_id_idx on public.members(family_id);
 
--- app logins (mirror of local users; keeps salt + hash)
+-- allowlist of app logins.  user_id stays NULL until the person
+-- sets their password (signs up) and CLAIMS the row.
 create table if not exists public.app_users (
   id         text primary key,               -- login id (lowercased)
+  user_id    uuid unique,                    -- auth.uid() once claimed
   role       text not null default 'admin',  -- super | admin | family
   name       text default '',
   phone      text default '',
   family_id  text references public.families(id) on delete set null,
-  salt       text not null default '',
-  pass_hash  text not null default '',
   created_at timestamptz not null default now()
 );
 
--- sequence that hands out the numeric part of Family IDs
+-- ---------- helpers (security definer so they can read app_users
+--            without triggering the table's own RLS / recursion) ----------
+create or replace function public.is_member() returns boolean
+  language sql stable security definer set search_path = public as $$
+  select exists(select 1 from public.app_users where user_id = auth.uid());
+$$;
+create or replace function public.is_staff() returns boolean
+  language sql stable security definer set search_path = public as $$
+  select exists(select 1 from public.app_users where user_id = auth.uid() and role in ('super','admin'));
+$$;
+create or replace function public.is_super() returns boolean
+  language sql stable security definer set search_path = public as $$
+  select exists(select 1 from public.app_users where user_id = auth.uid() and role = 'super');
+$$;
+create or replace function public.my_family_id() returns text
+  language sql stable security definer set search_path = public as $$
+  select family_id from public.app_users where user_id = auth.uid();
+$$;
+create or replace function public.has_super() returns boolean
+  language sql stable security definer set search_path = public as $$
+  select exists(select 1 from public.app_users where role = 'super');
+$$;
+
+-- ---------- family id sequence + updated_at ----------
 create sequence if not exists public.family_seq start 1;
+create or replace function public.next_family_id() returns text
+  language plpgsql as $$
+  declare n bigint;
+  begin
+    n := nextval('public.family_seq');
+    return 'MEMC-' || to_char(now(), 'YYYY') || '-' || lpad(n::text, 6, '0');
+  end $$;
 
-create or replace function public.next_family_id()
-returns text language plpgsql as $$
-declare n bigint;
-begin
-  n := nextval('public.family_seq');
-  return 'MEMC-' || to_char(now(), 'YYYY') || '-' || lpad(n::text, 6, '0');
-end $$;
-
--- keep updated_at fresh
-create or replace function public.touch_updated_at()
-returns trigger language plpgsql as $$
-begin new.updated_at := now(); return new; end $$;
-
+create or replace function public.touch_updated_at() returns trigger
+  language plpgsql as $$ begin new.updated_at := now(); return new; end $$;
 drop trigger if exists families_touch on public.families;
 create trigger families_touch before update on public.families
   for each row execute function public.touch_updated_at();
 
--- ---------- row level security ----------
+-- ---------- ROW LEVEL SECURITY ----------
 alter table public.families  enable row level security;
 alter table public.members   enable row level security;
 alter table public.app_users enable row level security;
 
--- secure default: only authenticated (Supabase Auth) users may read/write
-drop policy if exists families_auth_all  on public.families;
-drop policy if exists members_auth_all   on public.members;
-drop policy if exists app_users_auth_all on public.app_users;
+-- clean slate (idempotent re-run)
+do $$ declare r record; begin
+  for r in select policyname, tablename from pg_policies
+           where schemaname='public' and tablename in ('families','members','app_users') loop
+    execute format('drop policy if exists %I on public.%I', r.policyname, r.tablename);
+  end loop;
+end $$;
 
-create policy families_auth_all  on public.families  for all to authenticated using (true) with check (true);
-create policy members_auth_all   on public.members   for all to authenticated using (true) with check (true);
-create policy app_users_auth_all on public.app_users for all to authenticated using (true) with check (true);
+-- app_users: read own row (or all if super)
+create policy au_read on public.app_users for select to authenticated
+  using ( user_id = auth.uid() or public.is_super() );
 
--- ---------- QUICK DEMO ONLY (uncomment to allow the anon key) ----------
--- WARNING: exposes all family data to anyone holding the public anon
--- key. Use only on a throwaway/demo project, never with real records.
---
--- create policy families_anon_all  on public.families  for all to anon using (true) with check (true);
--- create policy members_anon_all   on public.members   for all to anon using (true) with check (true);
--- create policy app_users_anon_all on public.app_users for all to anon using (true) with check (true);
+-- app_users: bootstrap — the FIRST user becomes super admin
+create policy au_bootstrap on public.app_users for insert to authenticated
+  with check ( not public.has_super() and user_id = auth.uid() );
+
+-- app_users: super admin provisions invites (user_id NULL = pending)
+create policy au_super_insert on public.app_users for insert to authenticated
+  with check ( public.is_super() );
+create policy au_super_update on public.app_users for update to authenticated
+  using ( public.is_super() ) with check ( public.is_super() );
+create policy au_super_delete on public.app_users for delete to authenticated
+  using ( public.is_super() );
+
+-- app_users: a pending invite CLAIMS itself when that person signs up
+-- (their login id = the part of their auth email before '@')
+create policy au_claim on public.app_users for update to authenticated
+  using ( user_id is null and id = lower(split_part(auth.email(), '@', 1)) )
+  with check ( user_id = auth.uid() );
+
+-- families: staff see/write all; a family login reads only its own record
+create policy fam_read on public.families for select to authenticated
+  using ( public.is_staff() or id = public.my_family_id() );
+create policy fam_write on public.families for all to authenticated
+  using ( public.is_staff() ) with check ( public.is_staff() );
+
+-- members: same rule, resolved through the owning family
+create policy mem_read on public.members for select to authenticated
+  using ( public.is_staff() or family_id = public.my_family_id() );
+create policy mem_write on public.members for all to authenticated
+  using ( public.is_staff() ) with check ( public.is_staff() );
+
+-- ============================================================
+--  NOTE: turn OFF "Confirm email" in Auth settings (the app uses
+--  synthetic addresses like admin@masjid.local, so there is no
+--  inbox to confirm). Auth → Providers → Email → disable confirm.
+-- ============================================================

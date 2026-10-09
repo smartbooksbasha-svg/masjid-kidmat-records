@@ -20,6 +20,9 @@ Files (deploy root = repo root, GitHub Pages serves `index.html`):
 - `ui-preview.html` — historical: the 3 design directions preview
 - `supabase/schema.sql` — tables (families, members, app_users), RLS ON,
                    `next_family_id()` sequence fn
+- `manifest.webmanifest` + `sw.js` + `icons/` + `tools/mkicon.py` — PWA:
+                   installable + offline app shell. Bump the `CACHE` name in
+                   `sw.js` on every web update or clients serve stale files.
 
 ## Data model (localStorage keys)
 `memc_users` · `memc_families` · `memc_seq` · `memc_session` · `memc_theme` ·
@@ -49,5 +52,6 @@ fallback). Family ID = `MEMC-<year>-<6-digit seq>`.
 
 ## State of things (2026-10-09)
 Shipped & live: https://smartbooksbasha-svg.github.io/masjid-kidmat-records/
-(commit `0b7a976`). jsdom smoke test 22/22 green.
-Open: wire Supabase keys; 375px responsive polish; real OTP SMS; optional PWA.
+Full app (`0b7a976`), PWA + mobile polish (`d370872`). jsdom smoke test
+22/22 green. Installable on phone (Add to Home Screen).
+Open: wire Supabase keys; more mobile polish; real OTP SMS.
