@@ -12,26 +12,31 @@ save, dashboard counts, Family ID + QR, 3-role login, PDF/Excel export.
 - [x] 2. User Research
 - [x] 3. Requirements (must/should/nice/future)
 - [x] 4. PRD.md — full blueprint
-- [~] 5. PRD Review + validate WITH user (PRD sent with preview gate)
-- [~] 11. Implementation — UI PREVIEW GATE LIVE 2026-10-09: repo
-  smartbooksbasha-svg/masjid-kidmat-records, ui-preview.html (3 directions).
-  Awaiting pick → then full build.
-- [ ] 6. User Flow
-- [ ] 7. UX (wireframe, IA, nav, states, mobile)
-- [ ] 8. UI Design System — load design-taste-frontend + ui-ux-pro-max engine
-- [ ] 9. Technical Spec (stack, schema, auth, file structure)
-- [ ] 10. Build Plan (milestones)
-- [ ] 11. Implementation (→ UI PREVIEW GATE after first screen)
-- [ ] 12. Testing (forms, auth, roles, exports, edge cases)
-- [ ] 13. Responsive (375px + desktop)
-- [ ] 14. Security (password hashing, role perms, input validation, XSS)
-- [ ] 15. Performance
-- [ ] 16. Accessibility
-- [ ] 17. SEO (meta, OG, favicon)
+- [x] 5. PRD Review — PRD v1.0 approved with preview gate (2026-10-09)
+- [x] 8. UI Design System — direction 2 "Emerald Lattice" (EMERALD/mint,
+      Sora + Manrope), DAY + NIGHT tokens in styles.css
+- [x] 9. Technical Spec — vanilla SPA; index.html + styles.css + app.js +
+      config.js; local-first localStorage, optional Supabase
+      (supabase/schema.sql written)
+- [x] 11. Implementation — DONE 2026-10-09. UI preview gate: 3 directions
+      (repo smartbooksbasha-svg/masjid-kidmat-records, ui-preview.html).
+      Shan picked direction 2 → full app built:
+        index.html  · styles.css · app.js · config.js · supabase/schema.sql
+      Auth (setup/login/captcha/OTP/roles), dashboard 9 stat boxes,
+      families list + search/filter, add/edit family + member rows,
+      documents YES/NO + 12 custom boxes, Family ID + QR, detail view,
+      users mgmt (admin + family logins), settings, Word→no: Excel + PDF
+      print + JSON backup, day/night theme.
+- [x] 12. Testing — headless jsdom smoke test: 22/22 checks green
+      (setup→login→captcha→OTP→dashboard→sample data→search→add family
+      with members→detail→theme). Project per-screen rule honoured.
+- [ ] 13. Responsive (375px + desktop polish pass)
+- [~] 14. Security — SHA-256+salt password hash (crypto.subtle), role
+      perms, XSS esc() on all output, input validation; cloud auth TBD
+- [ ] 15-17. Perf / a11y / SEO polish
 - [ ] 18. User Acceptance (real task for Shan)
-- [ ] 19. Iterate → 19b. CUSTOMIZATION ROUND (mandatory, before any deploy)
-- [ ] 20. Pre-Launch checklist
-- [ ] 21. Deploy (GitHub Pages static / full-stack host — depends on Q1 answer)
+- [ ] 19b. CUSTOMIZATION ROUND
+- [ ] 21. Deploy — GitHub Pages (repo has Pages ON already)
 - [ ] 22. Post-Launch
 
 ## Touchpoints (only these interrupt autonomy)
